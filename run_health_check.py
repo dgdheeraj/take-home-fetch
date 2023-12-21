@@ -6,6 +6,20 @@ import json
 import time
 from urllib.parse import urlparse
 
+import signal
+import sys
+
+# Made global - When signal handler is invoked, need to wait for any 
+# pending child processes 
+jobs = []
+
+def signal_handler(sig, frame):
+    while jobs:
+        process = jobs.pop(0)
+        process.join()
+    print("Exiting gracefully...")
+    exitProgram()
+
 def exitProgram():
         exit()
 
@@ -107,6 +121,11 @@ def parseFile(file_descriptor):
     
     return endpoints
 
+def displayStatistics(stats_dict):
+    for domain, stats in stats_dict.items():
+        percent = round(100 * stats["UP"] / stats["TOTAL"])
+        print(f"{domain} has {percent}% availability percentage")
+
 def testAllEndpoints(endpoints, mutex, stats_dict):
     """
     Create new Process for testing every endpoint to avoid
@@ -114,7 +133,6 @@ def testAllEndpoints(endpoints, mutex, stats_dict):
     Multithreading does not work as expected in Python 
     since it is serialized due Global Interpreter Lock (GIL)
     """
-    jobs = []
     for endpoint in endpoints:
         name, params = endpoint["name"], endpoint["params"]
         
@@ -126,14 +144,15 @@ def testAllEndpoints(endpoints, mutex, stats_dict):
         jobs.append(process)
         process.start()
     
-    for process in jobs:
+    while jobs:
+        process = jobs.pop(0)
         process.join()
     
-    for domain, stats in stats_dict.items():
-        percent = round(100 * stats["UP"] / stats["TOTAL"])
-        print(f"{domain} has {percent} availability percentage")
+    displayStatistics(stats_dict)
 
 def main():
+    signal.signal(signal.SIGINT, signal_handler)
+
     manager = multiprocessing.Manager()
     mutex = manager.Lock()
     stats_dict = manager.dict()

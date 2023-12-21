@@ -1,6 +1,7 @@
 # Fetch Take-Home Exercise — Site Reliability Engineering
 
-Take-Home Exercise for Fetch Site Reliability Engineering based on the [specifications](https://fetch-hiring.s3.us-east-1.amazonaws.com/site-reliability-engineer/health-check.pdf)
+Take-Home Exercise for Fetch Site Reliability Engineering based on the [specifications](https://fetch-hiring.s3.us-east-1.amazonaws.com/site-reliability-engineer/health-check.pdf).
+
 The script checks the health of a set of HTTP endpoints every 15s and displays the availability for every domain.
 
 ## Steps to Run

@@ -1,13 +1,11 @@
 import sys
 import yaml
-import requests
-import multiprocessing
 import json
 import time
-from urllib.parse import urlparse
-
 import signal
-import sys
+import requests
+import multiprocessing
+from urllib.parse import urlparse
 
 # Made global - When signal handler is invoked, need to wait for any 
 # pending child processes 
@@ -158,8 +156,10 @@ def main():
     stats_dict = manager.dict()
 
     file_descriptor = getInputFile()
+    
     endpoints = parseFile(file_descriptor)
     endpoints = formatAllEndpoints(endpoints)
+
     while True:
         testAllEndpoints(endpoints, mutex, stats_dict)
         time.sleep(15)
